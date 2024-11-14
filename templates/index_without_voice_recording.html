@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Menu</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .left-partition {
+            width: 30%;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-partition {
+            width: 80%;
+            height: 100vh;
+            padding: 0;
+            display: flex;
+            align-content: center;
+            justify-content: center;
+        }
+        #user-input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 5px;
+            resize: vertical;   /* Allows the user to resize the textarea vertically */
+            height: 80px;       /* Default height */
+            overflow-y: auto;   /* Adds a vertical scrollbar when needed */
+        }
+        #output-text {
+            flex-grow: 1;
+            width: 100%;
+            margin-top: 10px;
+            padding: 5px;
+        }
+        .image-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        .image-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        textarea {font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-partition">
+        <label for="user-input">Type your order:</label>
+        <textarea id="user-input" maxlength="255"></textarea>
+        <textarea id="output-text" readonly>This is an AI generated output text space.</textarea>
+    </div>
+    <div class="right-partition" id="image-container"></div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const outputText = document.getElementById('output-text');
+        const imageContainer = document.getElementById('image-container');
+
+        userInput.addEventListener('keyup', async (event) => {
+            if (event.key === 'Enter') {
+                // Clear the output text and display processing message
+                outputText.value = "Your query is being processed. Please wait as we are experiencing high volume of requests ....";
+
+                // Clear previous images
+                imageContainer.innerHTML = '';
+
+                try {
+                    const response = await fetch('/process_input', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({user_input: userInput.value})
+                    });
+                    const data = await response.json();
+                    
+                    // Update output text with the response
+                    outputText.value = data.output_text;
+                    
+                    // Display new images
+                    data.images.forEach(imgSrc => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'image-wrapper';
+                        const img = document.createElement('img');
+                        img.src = imgSrc;
+                        wrapper.appendChild(img);
+                        imageContainer.appendChild(wrapper);
+                    });
+                } catch (error) {
+                    outputText.value = "An error occurred while processing your query.";
+                    console.error('Error:', error);
+                }
+
+                // Clear the input field
+                userInput.value = '';
+            }
+        });
+
+        // Initial load of images
+        fetch('/get_images')
+            .then(response => response.json())
+            .then(data => {
+                data.images.forEach(imgSrc => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'image-wrapper';
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    wrapper.appendChild(img);
+                    imageContainer.appendChild(wrapper);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading initial images:', error);
+            });
+    </script>
+</body>
+</html>
