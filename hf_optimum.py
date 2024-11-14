@@ -8,7 +8,7 @@ from transformers import AutoTokenizer
 
 ###################### STEP 1 - Convert the model to openvino IR format #################################################
 model_id = "meta-llama/Llama-3.2-3B-Instruct"
-OV_model_id = "hf_optimum_auto-Llama-3.2-3B-Instruct"
+OV_model_id = "C:/Users/chiauho.ong/.cache/huggingface/hub/hf_optimum_auto-Llama-3.2-3B-Instruct"
 
 # export=True means the model is converted to openvino IR format on the fly. load_in_8bit means to optimize through weight compression using NNCF
 # Note that for model > 1B parameter, weight compression is applied by default

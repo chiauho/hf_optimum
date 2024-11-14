@@ -309,7 +309,7 @@ if __name__ == "__main__":
     g_topk = 5  # retrieve top x documents match to query. Later use rerank to limit to 5 documents for display
     embedding_model = "sentence-transformers/all-mpnet-base-v2"
     model_name = "meta-llama/Llama-3.2-3B-Instruct"
-    OV_model_name = "hf_optimum_auto-Llama-3.2-3B-Instruct"     # This should be found in the same place as this code
+    OV_model_name = "C:/Users/chiauho.ong/.cache/huggingface/hub/hf_optimum_auto-Llama-3.2-3B-Instruct"     # This should be found in the same place as this code
 
     chromadb_dir = "./chroma_all-mpnet-base-v2-hr_docs"     # where to retrieve stored text and embeddings
     # chromadb_dir = "./chroma_test"
