@@ -221,10 +221,10 @@ def llm(context, u_query, filename_list, page_list):
     print(f"Generate answers")
     start_time = time.perf_counter()
     print(f"Start time: {start_time}")
-    outputs = g_model.generate(input_ids,
-                               temperature=0.1,   # lower temperature = more deterministic outputs, higher temperature = more creative outputs
-                               do_sample=True,    # to use sampling or not, see https://huyenchip.com/2024/01/16/sampling.html for more
-                               max_new_tokens=1000)  # how many new tokens to generate from prompt
+    outputs = g_model.generate(**inputs,                # don't pass input_ids, pass inputs because passing inputs also pass the mask which avoids unpredictable results
+                               temperature=0.1,         # lower temperature = more deterministic outputs, higher temperature = more creative outputs
+                               do_sample=True,          # to use sampling or not, see https://huyenchip.com/2024/01/16/sampling.html for more
+                               max_new_tokens=1000)     # how many new tokens to generate from prompt
     end_time = time.perf_counter()
     print(f"End time: {end_time}")
     lapse = (end_time-start_time) / 60
@@ -311,8 +311,8 @@ if __name__ == "__main__":
     model_name = "meta-llama/Llama-3.2-3B-Instruct"
     OV_model_name = "hf_optimum_auto-Llama-3.2-3B-Instruct"     # This should be found in the same place as this code
 
-    # chromadb_dir = "./chroma_all-mpnet-base-v2-hr_docs"     # where to retrieve stored text and embeddings
-    chromadb_dir = "./chroma_test"
+    chromadb_dir = "./chroma_all-mpnet-base-v2-hr_docs"     # where to retrieve stored text and embeddings
+    # chromadb_dir = "./chroma_test"
     model_kwargs = {'device': 'cpu'}  # {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': True}
 

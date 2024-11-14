@@ -1,6 +1,6 @@
 # https://docs.openvino.ai/2024/learn-openvino/llm_inference_guide/llm-inference-hf.html
 # Use intel's openvino. There are different ways to use openvino. I will use the hugging face and optimum method.
-# pip install optimum[openvino, nncf]. Note that NNCF is optional. It optimizes the model for small footprint and faster inference
+# pip install optimum[openvino,nncf]. Note that NNCF is optional. It optimizes the model for small footprint and faster inference
 
 # Start using openvino as a backend for hugging face
 from optimum.intel import OVModelForCausalLM    # instead of from transformers import AutoModelForCausalLM
@@ -9,10 +9,11 @@ from transformers import AutoTokenizer
 ###################### STEP 1 - Convert the model to openvino IR format #################################################
 model_id = "meta-llama/Llama-3.2-3B-Instruct"
 OV_model_id = "hf_optimum_auto-Llama-3.2-3B-Instruct"
+
 # export=True means the model is converted to openvino IR format on the fly. load_in_8bit means to optimize through weight compression using NNCF
 # Note that for model > 1B parameter, weight compression is applied by default
-#model = OVModelForCausalLM.from_pretrained(model_id, export=True, load_in_8bit=True, device_map="auto")
-#model.save_pretrained(OV_model_id)
+model = OVModelForCausalLM.from_pretrained(model_id, export=True, load_in_8bit=True, device_map="auto")
+model.save_pretrained(OV_model_id)
 
 ##################### STEP 2
 # load model
@@ -48,5 +49,5 @@ dialogue_template = [
 prompt = tokenizer.apply_chat_template(dialogue_template, tokenize=False, add_generation_prompt=True)
 
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-outputs = model.generate(**inputs, max_new_tokens=500)
+outputs = model.generate(**inputs, max_new_tokens=500, do_sample=True, temperature=0.1)
 print(tokenizer.decode(outputs[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True))
